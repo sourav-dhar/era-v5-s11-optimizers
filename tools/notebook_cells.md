@@ -566,15 +566,18 @@ for prm, c in [('sp', PAL['blue']), ('mup', PAL['aqua'])]:
                     color=c, mfc=c if w in widths else SURF, ms=6, capsize=3, mew=1.6)
         rows.append(dict(param=prm, width=w, held_out=w in hold, lr_star=f['lr'], ci_lo=f['ci'][0], ci_hi=f['ci'][1], loss=f['loss']))
     lo_, hi_ = law[prm]['rec_range']
+    # SP: geometric mean of the three extrapolations. muP: the single LR that was best at every width (computed below).
+    common = sorted(set.intersection(*[set(F[w]['mean']) for w in W4]))
+    rec = min(common, key=lambda l: max(F[w]['mean'][l] - F[w]['loss'] for w in W4)) if prm == 'mup' else law[prm]['recommend']
     ax.plot([4096, 4096], [lo_, hi_], color=c, lw=6, alpha=0.3, solid_capstyle='butt')
-    ax.plot([4096], [law[prm]['recommend']], marker='*', ms=16, color=c, mec='white')
-    label_end(ax, 4096, law[prm]['recommend'], f"{prm.upper()}: {law[prm]['recommend']:.1e}", c, dx=12, dy=-10 if prm == 'mup' else 0)
+    ax.plot([4096], [rec], marker='*', ms=16, color=c, mec='white')
+    label_end(ax, 4096, rec, f"{'muP' if prm == 'mup' else 'SP'}: {rec:.1e}", c, dx=12, dy=-10 if prm == 'mup' else 0)
 ax.plot([256, 4096], [3e-3, 3e-3 * 256 / 4096], color=MUTED, lw=1, ls=':'); ax.text(300, 3.4e-3, 'lesson’s table (∝ 1/width)', color=MUTED, fontsize=8)
 ax.set_xticks([256, 512, 1024, 2048, 4096]); ax.set_xticklabels(['256', '512', '1,024', '2,048\n(held out)', '4,096\n(predicted)'])
 ax.xaxis.set_minor_formatter(mpl.ticker.NullFormatter()); ax.xaxis.set_minor_locator(mpl.ticker.NullLocator())
 ax.set_xlabel('width'); ax.set_ylabel('best peak LR')
 title(ax, 'The width law, fitted on three widths and tested on a fourth',
-      'dashed: power law through 256–1,024 · hollow: held out · bar at 4,096: range of three estimators, ★ their geometric mean')
+      'dashed: fit through 256–1,024 · hollow: held out · bar at 4,096: range of three extrapolations · ★ the value I would use')
 save(fig, '05_width_law')
 mt = pd.DataFrame(rows); display(mt.style.format({'lr_star': '{:.2e}', 'ci_lo': '{:.2e}', 'ci_hi': '{:.2e}', 'loss': '{:.4f}'}))
 for prm in ('sp', 'mup'):

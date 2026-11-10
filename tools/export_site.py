@@ -114,8 +114,20 @@ def main(profile):
     (ROOT / 'site').mkdir(exist_ok=True)
     (ROOT / 'site/data.js').write_text(js, encoding='utf-8')
     src = (ROOT / 'site/index.src.html').read_text(encoding='utf-8')
-    (ROOT / 'site/index.html').write_text(src.replace('/*DATA*/', js.replace('</', '<\\/')), encoding='utf-8')
-    print(f'site/data.js: {len(js) / 1024:.0f} KiB -> site/index.html')
+    page = src.replace('/*DATA*/', js.replace('</', '<\\/'))
+    (ROOT / 'site/index.html').write_text(page, encoding='utf-8')          # body fragment (claude.ai artifact)
+    # a complete standalone document for GitHub Pages (docs/index.html)
+    cut = page.index('<div class="wrap">')
+    head, body = page[:cut], page[cut:]
+    full = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
+            '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+            '<meta name="description" content="ERA V5 Session 11: six optimizer and learning-rate-schedule claims re-measured on a character-level GPT, '
+            'with interactive charts drawn from 408 training runs.">\n'
+            + head + '<style>html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n</head>\n<body>\n' + body + '\n</body>\n</html>\n')
+    (ROOT / 'docs').mkdir(exist_ok=True)
+    (ROOT / 'docs/index.html').write_text(full, encoding='utf-8')
+    (ROOT / 'docs/.nojekyll').write_text('', encoding='utf-8')
+    print(f'site/data.js: {len(js) / 1024:.0f} KiB -> site/index.html, docs/index.html')
 
 
 if __name__ == '__main__':

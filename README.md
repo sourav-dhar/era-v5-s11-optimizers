@@ -7,7 +7,7 @@ The lesson ends with a warning: *"Tune both sides before accepting a comparison.
 Everything runs on the Session 10 model, a character-level GPT trained on TinyShakespeare, as the brief asks. The results come from **408 training runs, about 1.6 A100-hours on Modal**. Every number below is printed by a cell in the notebook, which reads it from the stored record of each run.
 
 - **Notebook:** [`optimizers_and_schedules.ipynb`](optimizers_and_schedules.ipynb), executed, with every figure and table.
-- **Interactive companion page:** [Optimizer Claims, Re-measured](https://claude.ai/artifact/N39Wrb3Rk6YZqpbbfJ8E4p). You can step through Adam with your own gradients, slide β₂, hover any layer at any step of training, and switch between SP and muP.
+- **Interactive companion page:** [sourav-dhar.github.io/era-v5-s11-optimizers](https://sourav-dhar.github.io/era-v5-s11-optimizers/). You can step through Adam with your own gradients, slide β₂, hover any layer at any step of training, switch between SP and muP, and see how Muon's lead changes as the AdamW baseline improves. Every chart on it is drawn from the same result files.
 - **Code:** [`s11/`](s11) holds the model, optimizers, schedules, training loop and analysis. [`tools/`](tools) holds the Modal runner and the notebook build. [`tests/`](tests) holds 7 checks.
 
 ---
@@ -281,6 +281,6 @@ s11/       data.py · model.py (SP and muP) · optim.py (Adam by hand, HandAdamW
 tools/     modal_app.py · notebook_cells.md → build_notebook.py → optimizers_and_schedules.ipynb · run_notebook.py · export_site.py
 results/   <study>.full.json (full record of every run) · summary.full.json (every number quoted above)
 figures/   every figure in this README
-site/      the interactive companion page
+site/      the companion page source (index.src.html) · docs/  the built page served by GitHub Pages
 tests/     test_core.py
 ```

@@ -388,7 +388,7 @@ function bowl() {
     const c = C(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
     for (let i = 1; i <= 9; i++) { const Lv = 0.012 * i * i * i * 1.15; const a = Math.sqrt(2 * Lv / 20), b = Math.sqrt(2 * Lv);
       ctx.beginPath(); ctx.ellipse(X(0), Y(0), a / (U[1] - U[0]) * w, b / (V[1] - V[0]) * h, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = hexA(c.ink2.startsWith('#') ? c.ink2 : '#888888', 0.10 + 0.012 * (10 - i)); ctx.lineWidth = 1; ctx.stroke(); }
+      ctx.strokeStyle = hexA(c.ink2.startsWith('#') ? c.ink2 : '#888888', 0.16 + 0.02 * (10 - i)); ctx.lineWidth = 1; ctx.stroke(); }
     ctx.fillStyle = c.muted; ctx.font = '500 11px "IBM Plex Mono", monospace';
     ctx.fillText('u (steep, curvature 20)', 10, h - 10); ctx.save(); ctx.translate(w - 10, 16); ctx.textAlign = 'right'; ctx.fillText('v (shallow, curvature 1)', 0, 0); ctx.restore();
     ctx.beginPath(); ctx.arc(X(0), Y(0), 4, 0, Math.PI * 2); ctx.fillStyle = c.aqua; ctx.fill();
@@ -401,9 +401,14 @@ function bowl() {
     const dist = P => Math.hypot(...P[Math.min(k, P.length - 1)]);
     $('bowlStat').textContent = `step ${String(k).padStart(2, ' ')} · distance left: GD ${dist(gd).toFixed(2)} · Adam ${dist(ad).toFixed(2)}`;
   };
-  size(); let k = MOTION ? 0 : N, last = 0, hold = 0;
-  const loop = (ts) => { if (!MOTION) return; if (ts - last > 75) { last = ts; if (k < N) k++; else if (++hold > 26) { k = 0; hold = 0; } frame(k); } requestAnimationFrame(loop); };
-  frame(k); if (MOTION) requestAnimationFrame(loop);
+  size(); let k = MOTION ? 0 : N, last = 0, hold = 0, running = false, visible = true;
+  // the animation runs only while the hero is on screen and the tab is visible
+  const loop = (ts) => { if (!MOTION || !visible || document.hidden) { running = false; return; }
+    if (ts - last > 75) { last = ts; if (k < N) k++; else if (++hold > 26) { k = 0; hold = 0; } frame(k); } requestAnimationFrame(loop); };
+  const start = () => { if (!running && MOTION && visible && !document.hidden) { running = true; requestAnimationFrame(loop); } };
+  if ('IntersectionObserver' in window) new IntersectionObserver(es => { visible = es[0].isIntersecting; start(); }).observe(cv);
+  document.addEventListener('visibilitychange', start);
+  frame(k); start();
   if ('ResizeObserver' in window) new ResizeObserver(() => { size(); frame(k); }).observe(cv);
 }
 

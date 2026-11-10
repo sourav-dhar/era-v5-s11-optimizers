@@ -304,7 +304,7 @@ function chart(host, o) {
   const c = C(); host.innerHTML = '';
   if (o.title) { const t = document.createElement('div'); t.className = 'ttl'; t.textContent = o.title; host.appendChild(t); }
   if (o.sub) { const t = document.createElement('div'); t.className = 'sub'; t.textContent = o.sub; host.appendChild(t); }
-  const W = 520, H = o.h || 300, m = { l: 52, r: o.right ?? 96, t: 12, b: 38 };
+  const W = o.w || 520, H = o.h || 300, m = { l: 52, r: o.right ?? 96, t: 12, b: 38 };
   const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': o.title || 'chart' }, host);
   const pts = o.series.flatMap(s => s.pts.filter(p => p[1] != null && isFinite(p[1]) && isFinite(p[0])));
   const mpts = (o.marks || []).flatMap(k => [k.x]).filter(isFinite);
@@ -338,10 +338,10 @@ function chart(host, o) {
       el('path', { d: `M${sx(P[0][0]).toFixed(1)},${base}` + P.map(p => `L${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join('') + `L${sx(P.at(-1)[0]).toFixed(1)},${base}Z`, fill: `url(#${gid})`, class: 'fadein', 'clip-path': `url(#c${uid})` }, svg);
     }
     el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': s.width || 2, 'stroke-dasharray': s.dash || '', 'stroke-linejoin': 'round', 'stroke-linecap': 'round', class: 'series', 'data-solid': s.dash ? 0 : 1, 'clip-path': `url(#c${uid})`, opacity: s.opacity ?? 1 }, svg);
-    if (s.dots) for (const p of P) el('circle', { cx: sx(p[0]), cy: sy(p[1]), r: s.dots, fill: s.color, class: 'fadein' }, svg);
-    for (const p of P) all.push({ x: sx(p[0]), y: sy(p[1]), p, s });
     const lowY = Math.min(y0, y1), highY = Math.max(y0, y1), PL = P.filter(p => p[1] >= lowY && p[1] <= highY);
-    if (s.label) { const last = (PL.length ? PL : P)[(PL.length ? PL : P).length - 1]; labels.push({ y: sy(last[1]), x: sx(last[0]), text: s.label, color: s.color, end: s.endDot !== false && !s.dots });
+    if (s.dots) for (const p of PL) el('circle', { cx: sx(p[0]), cy: sy(p[1]), r: s.dots, fill: s.color, class: 'fadein', 'clip-path': `url(#c${uid})` }, svg);
+    for (const p of PL) all.push({ x: sx(p[0]), y: sy(p[1]), p, s });
+    if (s.label) { const last = (PL.length ? PL : P)[(PL.length ? PL : P).length - 1]; labels.push({ y: sy(last[1]), x: sx(last[0]), text: s.label, color: s.color, dash: s.dash, end: s.endDot !== false && !s.dots });
       if (s.endDot !== false && !s.dots) el('circle', { cx: sx(last[0]), cy: sy(last[1]), r: 3, fill: s.color, stroke: c.panel, 'stroke-width': 1.5, class: 'fadein' }, svg); }
   }
   for (const mk of o.marks || []) {
@@ -353,8 +353,14 @@ function chart(host, o) {
     if (mk.label) { const t = el('text', { x: sx(mk.x) + (mk.dx ?? 9), y: sy(mk.y) + (mk.dy ?? 4), class: 'lab', 'text-anchor': mk.anchor || 'start' }, svg); t.textContent = mk.label; t.style.fill = mk.color; }
     all.push({ x: sx(mk.x), y: sy(mk.y), p: [mk.x, mk.y], s: { label: mk.tip || mk.label, color: mk.color } });
   }
-  labels.sort((a, b) => a.y - b.y); for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 12) labels[i].y = labels[i - 1].y + 12;
-  for (const L of labels) { const t = el('text', { x: Math.min(L.x + 8, W - m.r + 8), y: L.y + 3.5, class: 'lab' }, svg); t.textContent = L.text; t.style.fill = L.color; }
+  if (o.legend) {
+    labels.forEach((L, i) => { const y = (o.legendY ?? (m.t + 10)) + i * 14, x = o.legendX ?? (m.l + 10);
+      el('line', { x1: x, x2: x + 14, y1: y, y2: y, stroke: L.color, 'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-dasharray': L.dash || '' }, svg);
+      const t = el('text', { x: x + 20, y: y + 3.5, class: 'lab' }, svg); t.textContent = L.text; t.style.fill = L.color; });
+  } else {
+    labels.sort((a, b) => a.y - b.y); for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 12) labels[i].y = labels[i - 1].y + 12;
+    for (const L of labels) { const t = el('text', { x: Math.min(L.x + 8, W - m.r + 8), y: Math.min(L.y, H - m.b - 2) + 3.5, class: 'lab' }, svg); t.textContent = L.text; t.style.fill = L.color; }
+  }
   const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; host.appendChild(tip);
   const dot = el('circle', { r: 5, fill: c.panel, stroke: c.ink, 'stroke-width': 2, visibility: 'hidden' }, svg);
   const move = ev => {
@@ -438,7 +444,7 @@ function findings() {
   $('findings').innerHTML = items.map(([k, b, col, w]) => `<div class="finding"><span class="k">${k}</span><span class="big" style="color:${col}" data-v="${b}">${b}</span><span class="what">${w}</span></div>`).join('');
   if (!MOTION) return;
   document.querySelectorAll('.finding .big').forEach((n, i) => {
-    const full = n.dataset.v, nums = full.match(/[\d.,]+/g); if (!nums) return;
+    const full = n.dataset.v, nums = full.match(/[\d.,]+/g); if (!nums || /e[−-]|→/.test(full)) return;   // count only plain numbers
     const t0 = performance.now() + i * 90, dur = 900;
     const tick = (now) => { const p = Math.min(1, Math.max(0, (now - t0) / dur)), e = 1 - (1 - p) ** 3;
       let j = 0; n.textContent = full.replace(/[\d.,]+/g, s => { const v = parseFloat(s.replace(/,/g, '')), dec = (s.split('.')[1] || '').length; const x = v * e; j++; return s.includes(',') ? comma(x) : x.toFixed(dec); });
@@ -525,7 +531,7 @@ function drawRatio() {
   R.names.forEach((n, j) => ctx.fillText(n, 0, j * ch + ch / 2));
   run.M.forEach((row, i) => row.forEach((v, j) => { ctx.fillStyle = v == null ? c.rule : col(v); ctx.fillRect(left + i * cw, j * ch, cw + 0.5, ch - 1); }));
   if (rWv) { const i = run.step.findIndex(s => s >= rWv); ctx.fillStyle = c.orange; ctx.fillRect(left + i * cw, -2, 1.5, nL * ch + 2); }
-  ctx.fillStyle = c.muted; [1, 10, 100, run.step[nT - 1]].forEach(s => { const i = run.step.findIndex(x => x >= s); if (i >= 0) ctx.fillText(comma(s), left + i * cw, nL * ch + 10); });
+  ctx.fillStyle = c.muted; [1, 10, 100, run.step[nT - 1]].forEach((s, q, arr) => { const i = run.step.findIndex(x => x >= s); if (i >= 0) { ctx.textAlign = q === arr.length - 1 ? 'right' : 'left'; ctx.fillText(comma(s), left + (q === arr.length - 1 ? nT * cw : i * cw), nL * ch + 10); } }); ctx.textAlign = 'left';
   const bar = document.createElement('div'); bar.className = 'cbar';
   bar.innerHTML = `<span>1e−4</span><span class="r" style="background:linear-gradient(90deg,${stops.map(s => `rgb(${s.join(',')})`).join(',')})"></span><span>5e−2</span>`;
   host.appendChild(bar);
@@ -560,7 +566,7 @@ function drawSched() {
   const cos = (t, T) => t < W ? (t + 1) / W : 0.5 * (1 + Math.cos(Math.PI * Math.min(1, (t - W + 1) / Math.max(1, T - W))));
   const wsd = t => t < W ? (t + 1) / W : t < S - Dd ? 1 : 1 - (t - (S - Dd) + 1) / Dd;
   const xs = [...Array(S).keys()];
-  chart($('schedLR'), { title: 'The schedules', sub: `WSD branch: checkpoint at ${stop - Dd}, decay ${Dd} steps`, h: 260, right: 84,
+  chart($('schedLR'), { title: 'The schedules', sub: `WSD branch: checkpoint at ${stop - Dd}, decay ${Dd} steps`, h: 260, right: 18, legend: true, legendX: 92, legendY: 168,
     x: { domain: [0, S], label: 'step', name: 'step', fmt: v => v }, y: { domain: [0, 1.08], label: 'LR / peak', name: 'LR', fmt: v => v.toFixed(2) },
     vlines: [{ x: stop, color: c.orange, label: `stop at ${stop}` }],
     series: [{ pts: xs.map(t => [t, wsd(t)]), color: c.blue, label: `WSD-${S}`, area: true }, { pts: xs.map(t => [t, cos(t, S)]), color: c.violet, label: `cosine-${S}` },
@@ -578,7 +584,7 @@ function drawSched() {
     vlines: [{ x: stop, color: c.orange }], series: ser, marks });
   const rows = (Sm.schedules || []).filter(r => r.val != null).sort((a, b) => a.val - b.val);
   const host = $('schedRank'); const H = 30 + rows.length * 22;
-  chart(host, { title: 'Every model you could ship, each at its own best LR', sub: 'mean ± 1 sd over seeds · hover for the LR each one needed', h: H, right: 300,
+  chart(host, { title: 'Every model you could ship, each at its own best LR', sub: 'mean ± 1 sd over seeds · hover for the LR each one needed', h: H, w: 1100, right: 330,
     x: { label: 'val loss', name: 'val', fmt: v => v.toFixed(4) }, y: { domain: [rows.length + 0.4, 0.4], label: '', name: 'rank', fmt: v => '#' + Math.round(v), fmtTick: () => '' },
     series: [], marks: rows.map((r, i) => ({ x: r.val, y: i + 1, err: [r.val - r.std, r.val + r.std], r: 4.5, color: /stopped at/.test(r.model) ? c.orange : /branch/.test(r.model) ? c.aqua : /EMA|constant/.test(r.model) ? c.yellow : /full/.test(r.model) ? c.muted : c.violet,
       label: r.model, dx: 10, tip: `${r.model} (lr ${r.best_lr})` })) });
@@ -639,7 +645,7 @@ function drawMuon() {
   const rows = Sm.muon || [], r1 = rows.find(r => r.width === mW) || rows.at(-1) || {};
   // the tuning ladder, as horizontal bars
   const lad = [['AdamW at a default LR', r1.speedup_vs_default, c.muted], ['AdamW, LR tuned', r1.speedup_vs_lr_tuned, c.blue], ['AdamW, LR and β₂ tuned', r1.speedup_tuned, c.violet], ['AdamW, muP and LR tuned', r1.speedup_vs_mup, c.aqua]];
-  chart($('muLadder'), { title: `How fast Muon looks depends on the baseline (width ${comma(mW)})`, sub: '600 ÷ the step at which Muon’s val loss reaches the baseline’s final val loss · shaded: the lesson’s 1.1–1.4×', h: 168, right: 210,
+  chart($('muLadder'), { title: `How fast Muon looks depends on the baseline (width ${comma(mW)})`, sub: '600 ÷ the step at which Muon’s val loss reaches the baseline’s final val loss · shaded: the lesson’s 1.1–1.4×', h: 190, w: 1100, right: 290,
     x: { domain: [0, Math.max(4, ...lad.map(l => l[1] || 0)) * 1.05], label: 'apparent Muon speedup (×)', name: 'speedup', fmt: v => v.toFixed(2) + '×' }, y: { domain: [4.6, 0.4], label: '', name: '', fmtTick: () => '' },
     bands: [{ x: [1.1, 1.4] }], vlines: [{ x: 1, color: c.ink2, dash: '3 3' }],
     series: lad.map(([n, v, col], i) => ({ pts: [[0, i + 1], [v, i + 1]], color: col, width: 12, endDot: false })),

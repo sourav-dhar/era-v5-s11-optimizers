@@ -1,0 +1,9 @@
+torch>=2.5
+numpy
+pandas
+matplotlib
+nbformat
+nbconvert
+ipykernel
+modal
+pytest

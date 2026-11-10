@@ -1,0 +1,504 @@
+<title>Optimizer Claims, Re-measured</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a lab notebook — one 68ch reading column, each study a numbered entry with its instrument (chart) breaking wider than the text. */
+:root {
+  --bg: #fcfcfb; --panel: #f4f4f1; --ink: #0f1112; --ink2: #4c4d4a; --muted: #85857f; --rule: #e3e2dd;
+  --blue: #2a78d6; --orange: #eb6834; --aqua: #1baf7a; --yellow: #c98a00; --magenta: #d9658f; --violet: #6250d6; --red: #e34948;
+  --band: rgba(27,175,122,.10);
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121416; --panel: #1a1d20; --ink: #ecebe7; --ink2: #b4b3ad; --muted: #7d7d77; --rule: #2b2f33;
+  --blue: #5b9be6; --orange: #f08155; --aqua: #34c591; --yellow: #e2a73a; --magenta: #ec88ad; --violet: #8f80ec; --red: #f06b6a;
+  --band: rgba(52,197,145,.12); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #121416; --panel: #1a1d20; --ink: #ecebe7; --ink2: #b4b3ad; --muted: #7d7d77; --rule: #2b2f33;
+  --blue: #5b9be6; --orange: #f08155; --aqua: #34c591; --yellow: #e2a73a; --magenta: #ec88ad; --violet: #8f80ec; --red: #f06b6a;
+  --band: rgba(52,197,145,.12); color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 64px; }
+.wrap { max-width: 1060px; margin: 0 auto; }
+.col { max-width: 68ch; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; letter-spacing: -0.01em; margin: 0; }
+h1 { font-size: clamp(2.3rem, 6vw, 4.1rem); line-height: 1.0; font-weight: 700; }
+h2 { font-size: clamp(1.5rem, 3vw, 2.05rem); line-height: 1.1; font-weight: 600; }
+h3 { font-size: 1.08rem; font-weight: 600; }
+p { margin: 0; }
+.mono, code, .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+code { font-size: .88em; background: var(--panel); padding: .05em .35em; border-radius: 3px; }
+.eyebrow { font: 600 .74rem/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+header.hero { padding-block: 56px 28px; display: grid; gap: 18px; border-bottom: 1px solid var(--rule); }
+.hero .lede { font-size: 1.15rem; color: var(--ink2); max-width: 60ch; }
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0; margin-top: 10px; border-top: 1px solid var(--rule); }
+.finding { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 4px; align-content: start; }
+.finding .big { font: 600 1.7rem/1 var(--f-mono); }
+.finding .what { font-size: .9rem; color: var(--ink2); }
+nav.toc { display: flex; flex-wrap: wrap; gap: 6px 18px; padding-block: 16px; font: 500 .85rem var(--f-mono); }
+nav.toc a { color: var(--ink2); text-decoration: none; border-bottom: 1px solid var(--rule); }
+nav.toc a:hover { color: var(--ink); border-color: var(--ink); }
+section.study { padding-block: 52px 8px; display: grid; gap: 18px; border-bottom: 1px solid var(--rule); }
+.head { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: baseline; }
+.head .n { font: 600 1rem var(--f-mono); color: var(--blue); }
+.claim { border-left: 2px solid var(--rule); padding-left: 14px; color: var(--ink2); font-style: italic; }
+.answer { background: var(--panel); border-radius: 6px; padding: 14px 16px; }
+.answer b { font-weight: 600; }
+.instrument { display: grid; gap: 10px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; font-size: .88rem; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.seg button { font: 500 .82rem var(--f-mono); padding: 5px 10px; border: 0; background: transparent; color: var(--ink2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 22px; }
+.grid2 > * { min-width: 0; }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart .ttl { font: 600 .92rem var(--f-display); margin-bottom: 2px; }
+.chart .sub { font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); font: 500 .75rem/1.35 var(--f-mono); padding: 5px 8px; border-radius: 4px; white-space: nowrap; z-index: 3; }
+svg text { font-family: var(--f-mono); font-size: 10.5px; fill: var(--muted); }
+svg .lab { font-weight: 600; font-size: 10.5px; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; font-size: .86rem; width: 100%; }
+th, td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; font-variant-numeric: tabular-nums; }
+th { font: 600 .74rem var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+th:first-child, td:first-child { text-align: left; }
+td { font-family: var(--f-mono); }
+td:first-child { font-family: var(--f-body); }
+tr.win td { color: var(--aqua); font-weight: 600; }
+.gin { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.gin input { width: 5.2em; font: 500 .85rem var(--f-mono); padding: 4px 6px; border: 1px solid var(--rule); border-radius: 4px; background: var(--bg); color: var(--ink); }
+input[type=range] { accent-color: var(--blue); width: 200px; max-width: 60vw; }
+.note { font-size: .84rem; color: var(--muted); }
+canvas.heat { width: 100%; height: auto; display: block; border-radius: 3px; image-rendering: pixelated; }
+footer { padding-block: 40px 0; color: var(--muted); font-size: .86rem; display: grid; gap: 6px; }
+footer a { color: var(--ink2); }
+@media (prefers-reduced-motion: no-preference) { .chart path.series { transition: opacity .2s; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">ERA V5 · Session 11 · optimizers and learning-rate schedules</div>
+    <h1>Optimizer Claims, Re-measured</h1>
+    <p class="lede">Five claims from the lesson, tested on the Session 10 character-level GPT with every comparison tuned on both sides. The charts below are drawn from the actual runs; you can change their inputs.</p>
+    <div class="findings" id="findings"></div>
+  </header>
+  <nav class="toc" aria-label="Studies">
+    <a href="#adam">1 · Adam by hand</a><a href="#bias">2 · Bias correction</a><a href="#ratio">3 · Update-to-weight ratio</a>
+    <a href="#schedules">4 · Cosine vs WSD</a><a href="#width">5 · LR across width</a><a href="#muon">6 · AdamW vs Muon</a>
+  </nav>
+
+  <section class="study" id="adam">
+    <div class="head"><span class="n">§1</span><h2>Adam, by hand</h2></div>
+    <p class="claim col">“Adam moves every weight by approximately η, whatever the magnitude of its gradient.” (lesson §6)</p>
+    <p class="col">Type any five gradients. The table recomputes m, v, m̂, v̂ and the step with the exact rule the notebook checked against four PyTorch implementations. Switch bias correction off and watch step 1 jump to 3.16 η.</p>
+    <div class="instrument">
+      <div class="controls">
+        <div class="gin" id="gins" aria-label="five gradients"></div>
+        <div class="seg" role="group" aria-label="bias correction"><button id="bcOn" aria-pressed="true">bias correction on</button><button id="bcOff" aria-pressed="false">off</button></div>
+        <div class="seg" role="group" aria-label="presets"><button data-p="0">lesson</button><button data-p="1">÷100</button><button data-p="2">sign flips</button><button data-p="3">zero after 1</button></div>
+      </div>
+      <div class="grid2">
+        <div class="tbl"><table id="adamTbl"></table></div>
+        <div class="chart" id="adamChart"></div>
+      </div>
+      <p class="answer col" id="adamAns"></p>
+    </div>
+  </section>
+
+  <section class="study" id="bias">
+    <div class="head"><span class="n">§2</span><h2>Switching bias correction off</h2></div>
+    <p class="claim col">“It matters most at the first step.” (lesson §6)</p>
+    <p class="col">For a steady gradient the uncorrected step is the corrected one times f(t) = (1 − β₁ᵗ)/√(1 − β₂ᵗ). The numerator recovers on β₁’s ten-step clock and the denominator on β₂’s thousand-step clock, so the error <i>grows</i> after step 1 before it decays.</p>
+    <div class="instrument">
+      <div class="controls"><label for="b2">β₂ <span class="mono" id="b2v"></span></label><input type="range" id="b2" min="0" max="100" value="50"></div>
+      <div class="grid2">
+        <div class="chart" id="fChart"></div>
+        <div class="chart" id="bcChart"></div>
+      </div>
+      <div class="controls"><span class="note">real model, β₂ =</span><div class="seg" role="group" id="bcB2"></div></div>
+      <p class="answer col" id="biasAns"></p>
+    </div>
+  </section>
+
+  <section class="study" id="ratio">
+    <div class="head"><span class="n">§3</span><h2>The update-to-weight ratio, per layer</h2></div>
+    <p class="claim col">“That ratio, logged per layer, is the quantity to monitor. It should stay near 10⁻³ for the whole run.” (lesson §9)</p>
+    <p class="col">Every 2-D weight matrix of the 6-layer GPT at every step, as ‖ΔW‖/‖W‖. Hover the heatmap to read any cell. Warmup “stops changing” a layer at the first step after which the warmed-up run stays within 10% of the no-warmup run.</p>
+    <div class="instrument">
+      <div class="controls"><span class="note">peak LR</span><div class="seg" role="group" id="rLr"></div><span class="note">warmup</span><div class="seg" role="group" id="rW"></div></div>
+      <div class="grid2">
+        <div class="chart" id="heatWrap"></div>
+        <div class="chart" id="rLines"></div>
+      </div>
+      <div class="tbl"><table id="ratioTbl"></table></div>
+      <p class="answer col" id="ratioAns"></p>
+    </div>
+  </section>
+
+  <section class="study" id="schedules">
+    <div class="head"><span class="n">§4</span><h2>Cosine vs WSD, stopped at step 200 of 300</h2></div>
+    <p class="claim col">“Cosine needs the length of the run in advance and WSD does not.” (lesson §10)</p>
+    <p class="col">Stopping both schedules at step 200 compares a cosine that has already decayed with a WSD that has not started to. So every model you could ship at step 200 is measured below, each at its own best LR over 3 seeds.</p>
+    <div class="instrument">
+      <div class="grid2">
+        <div class="chart" id="schedLR"></div>
+        <div class="chart" id="schedVal"></div>
+      </div>
+      <div class="controls"><span class="note">peak LR for the curves</span><div class="seg" role="group" id="sLr"></div></div>
+      <div class="chart" id="schedRank"></div>
+      <p class="answer col" id="schedAns"></p>
+    </div>
+  </section>
+
+  <section class="study" id="width">
+    <div class="head"><span class="n">§5</span><h2>How the best learning rate moves with width</h2></div>
+    <p class="claim col">“Under the standard parameterization it varies roughly in inverse proportion to width … under muP the minimum is at the same value at every width.” (lesson §12)</p>
+    <p class="col">A 4-layer GPT swept over 12 learning rates at widths 256, 512 and 1,024, with 2 seeds and 600 steps. Width 2,048 is trained but <b>held out</b>: the width law is fitted without it, then checked against it before anything is claimed about 4,096.</p>
+    <div class="instrument">
+      <div class="controls"><div class="seg" role="group" id="wP"><button data-v="sp" aria-pressed="true">standard (SP)</button><button data-v="mup" aria-pressed="false">muP</button></div></div>
+      <div class="grid2">
+        <div class="chart" id="sweepChart"></div>
+        <div class="chart" id="lawChart"></div>
+      </div>
+      <p class="answer col" id="widthAns"></p>
+    </div>
+  </section>
+
+  <section class="study" id="muon">
+    <div class="head"><span class="n">§6</span><h2>AdamW vs Muon, both tuned</h2></div>
+    <p class="claim col">“Almost every optimizer claim that failed to replicate was a well tuned method measured against a badly tuned one.” (lesson §15)</p>
+    <p class="col">Muon handles the hidden matrices and AdamW handles everything else. Muon’s step is RMS-matched, so both optimizers share one LR axis and get the same sweep.</p>
+    <div class="instrument">
+      <div class="controls"><span class="note">width</span><div class="seg" role="group" id="mW"></div></div>
+      <div class="grid2">
+        <div class="chart" id="muSweep"></div>
+        <div class="chart" id="muCurve"></div>
+      </div>
+      <div class="tbl"><table id="muTbl"></table></div>
+      <p class="answer col" id="muAns"></p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Model: the Session 10 GPT (pre-norm, learned positions, GELU, untied head) on TinyShakespeare at the character level, bf16 autocast on an A100. Every number on this page is read from <code>results/*.full.json</code>, the records of the runs themselves.</p>
+    <p id="prof"></p>
+  </footer>
+</div>
+
+<script>/*DATA*/</script>
+<script>
+(() => {
+const D = window.S11, Sm = D.summary;
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = () => ({ blue: css('--blue'), orange: css('--orange'), aqua: css('--aqua'), yellow: css('--yellow'), magenta: css('--magenta'),
+  violet: css('--violet'), red: css('--red'), ink: css('--ink'), ink2: css('--ink2'), muted: css('--muted'), rule: css('--rule'), band: css('--band') });
+const fmt = (v, d = 3) => v == null || !isFinite(v) ? '—' : (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0) ? v.toExponential(Math.max(0, d - 2)) : (+v).toPrecision(d));
+const e1 = v => v == null || !isFinite(v) ? '—' : v.toExponential(1);
+const comma = v => Math.round(v).toLocaleString('en-US');
+const NS = 'http://www.w3.org/2000/svg';
+const el = (t, a = {}, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+
+/* ── a small SVG line-chart engine: linear/log axes, direct end labels, nearest-point tooltip ── */
+function ticks(lo, hi, log) {
+  if (log) { const out = []; for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++) for (const m of [1, 2, 5]) { const v = m * 10 ** e; if (v >= lo * 0.999 && v <= hi * 1.001) out.push(v); } return out.length > 9 ? out.filter(v => /^1/.test(v.toExponential())) : out; }
+  const span = hi - lo, step0 = 10 ** Math.floor(Math.log10(span / 5)); const step = [1, 2, 2.5, 5, 10].map(m => m * step0).find(s => span / s <= 6);
+  const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-12; v += step) out.push(+v.toPrecision(10)); return out;
+}
+const tickLab = (v, log) => log ? (v >= 1e4 || v < 1e-2 ? v.toExponential(0).replace('e-', 'e−') : String(v)) : (Math.abs(v) >= 1000 ? comma(v) : String(+v.toPrecision(4)));
+function chart(host, o) {
+  const c = C(); host.innerHTML = '';
+  if (o.title) { const t = document.createElement('div'); t.className = 'ttl'; t.textContent = o.title; host.appendChild(t); }
+  if (o.sub) { const t = document.createElement('div'); t.className = 'sub'; t.textContent = o.sub; host.appendChild(t); }
+  const W = 520, H = o.h || 300, m = { l: 52, r: o.right ?? 96, t: 10, b: 38 };
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': o.title || 'chart' }, host);
+  const pts = o.series.flatMap(s => s.pts.filter(p => p[1] != null && isFinite(p[1]) && isFinite(p[0])));
+  let [x0, x1] = o.x.domain || [Math.min(...pts.map(p => p[0])), Math.max(...pts.map(p => p[0]))];
+  let [y0, y1] = o.y.domain || [Math.min(...pts.map(p => p[1])), Math.max(...pts.map(p => p[1]))];
+  if (!o.y.domain && !o.y.log) { const pad = (y1 - y0) * 0.06 || 0.1; y0 -= pad; y1 += pad; }
+  const sx = o.x.log ? v => m.l + (Math.log(v) - Math.log(x0)) / (Math.log(x1) - Math.log(x0)) * (W - m.l - m.r) : v => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r);
+  const sy = o.y.log ? v => H - m.b - (Math.log(v) - Math.log(y0)) / (Math.log(y1) - Math.log(y0)) * (H - m.t - m.b) : v => H - m.b - (v - y0) / (y1 - y0) * (H - m.t - m.b);
+  const clipId = 'c' + Math.random().toString(36).slice(2);
+  el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b }, el('clipPath', { id: clipId }, el('defs', {}, svg)));
+  for (const b of o.bands || []) el('rect', { x: sx(b.x?.[0] ?? x0), y: sy(b.y?.[1] ?? y1), width: sx(b.x?.[1] ?? x1) - sx(b.x?.[0] ?? x0), height: sy(b.y?.[0] ?? y0) - sy(b.y?.[1] ?? y1), fill: b.fill || c.band, 'clip-path': `url(#${clipId})` }, svg);
+  for (const v of ticks(y0, y1, o.y.log)) { el('line', { x1: m.l, x2: W - m.r, y1: sy(v), y2: sy(v), stroke: c.rule, 'stroke-width': 1 }, svg); el('text', { x: m.l - 6, y: sy(v) + 3.5, 'text-anchor': 'end' }, svg).textContent = tickLab(v, o.y.log); }
+  for (const v of ticks(x0, x1, o.x.log)) { el('line', { x1: sx(v), x2: sx(v), y1: m.t, y2: H - m.b, stroke: c.rule, 'stroke-width': .6 }, svg); el('text', { x: sx(v), y: H - m.b + 15, 'text-anchor': 'middle' }, svg).textContent = tickLab(v, o.x.log); }
+  el('text', { x: (m.l + W - m.r) / 2, y: H - 4, 'text-anchor': 'middle' }, svg).textContent = o.x.label || '';
+  const yl = el('text', { x: 12, y: (m.t + H - m.b) / 2, 'text-anchor': 'middle', transform: `rotate(-90 12 ${(m.t + H - m.b) / 2})` }, svg); yl.textContent = o.y.label || '';
+  for (const h of o.hlines || []) { el('line', { x1: m.l, x2: W - m.r, y1: sy(h.y), y2: sy(h.y), stroke: h.color || c.ink2, 'stroke-width': 1, 'stroke-dasharray': h.dash || '4 4' }, svg); if (h.label) { const t = el('text', { x: m.l + 6, y: sy(h.y) - 5, class: 'lab' }, svg); t.textContent = h.label; t.style.fill = h.color || c.ink2; } }
+  for (const v of o.vlines || []) { el('line', { y1: m.t, y2: H - m.b, x1: sx(v.x), x2: sx(v.x), stroke: v.color || c.ink2, 'stroke-width': 1.3, 'stroke-dasharray': v.dash || '' }, svg); if (v.label) { const t = el('text', { x: sx(v.x) + 4, y: m.t + 11, class: 'lab' }, svg); t.textContent = v.label; t.style.fill = v.color || c.ink2; } }
+  const all = [];
+  const labels = [];
+  for (const s of o.series) {
+    const P = s.pts.filter(p => p[1] != null && isFinite(p[1]) && p[0] >= x0 * (o.x.log ? 0.999 : 1) - 1e-12 && p[0] <= x1 * 1.001 + 1e-12);
+    if (!P.length) continue;
+    let d = ''; let pen = false;
+    for (const p of s.pts) { if (p[1] == null || !isFinite(p[1])) { pen = false; continue; } d += (pen ? 'L' : 'M') + sx(p[0]).toFixed(1) + ',' + sy(p[1]).toFixed(1); pen = true; }
+    el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': s.width || 2, 'stroke-dasharray': s.dash || '', 'stroke-linejoin': 'round', 'stroke-linecap': 'round', class: 'series', 'clip-path': `url(#${clipId})`, opacity: s.opacity ?? 1 }, svg);
+    if (s.dots) for (const p of P) el('circle', { cx: sx(p[0]), cy: sy(p[1]), r: s.dots, fill: s.color }, svg);
+    for (const p of P) all.push({ x: sx(p[0]), y: sy(p[1]), p, s });
+    if (s.label) { const last = P[P.length - 1]; labels.push({ y: sy(last[1]), x: sx(last[0]), text: s.label, color: s.color }); }
+  }
+  for (const mk of o.marks || []) {
+    if (mk.y == null || !isFinite(mk.y)) continue;
+    if (mk.err) el('line', { x1: sx(mk.err[0]), x2: sx(mk.err[1]), y1: sy(mk.y), y2: sy(mk.y), stroke: mk.color, 'stroke-width': 1.5 }, svg);
+    if (mk.yerr) el('line', { x1: sx(mk.x), x2: sx(mk.x), y1: sy(mk.yerr[0]), y2: sy(mk.yerr[1]), stroke: mk.color, 'stroke-width': 1.5 }, svg);
+    if (mk.star) { const r = mk.r || 7, cx = sx(mk.x), cy = sy(mk.y); let d = ''; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; d += (i ? 'L' : 'M') + (cx + rr * Math.cos(a)).toFixed(1) + ',' + (cy + rr * Math.sin(a)).toFixed(1); } el('path', { d: d + 'Z', fill: mk.color, stroke: css('--bg'), 'stroke-width': 1.2 }, svg); }
+    else el('circle', { cx: sx(mk.x), cy: sy(mk.y), r: mk.r || 4, fill: mk.hollow ? css('--bg') : mk.color, stroke: mk.color, 'stroke-width': 1.6 }, svg);
+    if (mk.label) { const t = el('text', { x: sx(mk.x) + (mk.dx ?? 9), y: sy(mk.y) + (mk.dy ?? 4), class: 'lab', 'text-anchor': mk.anchor || 'start' }, svg); t.textContent = mk.label; t.style.fill = mk.color; }
+    all.push({ x: sx(mk.x), y: sy(mk.y), p: [mk.x, mk.y], s: { label: mk.tip || mk.label, color: mk.color } });
+  }
+  labels.sort((a, b) => a.y - b.y); for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 12) labels[i].y = labels[i - 1].y + 12;
+  for (const L of labels) { const t = el('text', { x: Math.min(L.x + 6, W - m.r + 6), y: L.y + 3.5, class: 'lab' }, svg); t.textContent = L.text; t.style.fill = L.color; }
+  const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; host.style.position = 'relative'; host.appendChild(tip);
+  const dot = el('circle', { r: 4, fill: 'none', stroke: c.ink, 'stroke-width': 1.5, visibility: 'hidden' }, svg);
+  svg.addEventListener('pointermove', ev => {
+    const r = svg.getBoundingClientRect(), k = W / r.width, mx = (ev.clientX - r.left) * k, my = (ev.clientY - r.top) * k;
+    let best = null, bd = 1e9; for (const a of all) { const dd = (a.x - mx) ** 2 + (a.y - my) ** 2; if (dd < bd) { bd = dd; best = a; } }
+    if (!best || bd > 900) { tip.hidden = true; dot.setAttribute('visibility', 'hidden'); return; }
+    dot.setAttribute('cx', best.x); dot.setAttribute('cy', best.y); dot.setAttribute('visibility', 'visible');
+    tip.hidden = false; tip.textContent = `${best.s.label ? best.s.label + ' · ' : ''}${o.x.name || 'x'} ${o.x.fmt ? o.x.fmt(best.p[0]) : fmt(best.p[0])} · ${o.y.name || 'y'} ${o.y.fmt ? o.y.fmt(best.p[1]) : fmt(best.p[1], 4)}`;
+    const hr = host.getBoundingClientRect(); let left = ev.clientX - hr.left + 12; if (left + tip.offsetWidth > hr.width) left = ev.clientX - hr.left - tip.offsetWidth - 12;
+    tip.style.left = left + 'px'; tip.style.top = (ev.clientY - hr.top - 30) + 'px';
+  });
+  svg.addEventListener('pointerleave', () => { tip.hidden = true; dot.setAttribute('visibility', 'hidden'); });
+  return { sx, sy };
+}
+function seg(host, items, cur, on) {
+  host.innerHTML = '';
+  for (const [v, lab] of items) { const b = document.createElement('button'); b.textContent = lab; b.setAttribute('aria-pressed', String(v === cur)); b.onclick = () => { [...host.children].forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); on(v); }; host.appendChild(b); }
+}
+const table = (t, head, rows, win) => { t.innerHTML = '<thead><tr>' + head.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>' + rows.map((r, i) => `<tr${win && win(r, i) ? ' class="win"' : ''}>` + r.map(v => `<td>${v}</td>`).join('') + '</tr>').join('') + '</tbody>'; };
+
+/* ── hero findings ── */
+function findings() {
+  const bf = Sm.bias_factor['0.999'], wl = Sm.width_law || {}, mu = (Sm.muon || []);
+  const g = Object.fromEntries((Sm.bias_real || []).map(r => [`${r['β₂']}/${r.warmup}`, r]));
+  const last = mu[mu.length - 1] || {};
+  const items = [
+    [`${bf.peak.toFixed(2)}×`, `over-step without bias correction, at step ${bf.peak_t} rather than step 1, and ${comma(bf.within1)} steps before it is within 1%`],
+    [g['0.999/40'] ? g['0.999/40']['final gap'].toFixed(2) : '—', 'nats lost by switching bias correction off under a short (40-step) warmup. A short warmup makes it worse, not hidden.'],
+    [wl.mup ? e1(wl.mup.common_lr) : '—', `one muP learning rate that is the best measured LR at every width from 256 to 2,048. Under SP the best single LR loses ${wl.sp ? wl.sp.worst_regret.toFixed(2) : '—'} nats somewhere.`],
+    [wl.sp ? e1(wl.sp.recommend) : '—', `best LR for width 4,096 under SP (range ${wl.sp ? e1(wl.sp.rec_range[0]) + '–' + e1(wl.sp.rec_range[1]) : '—'}). The power law missed the held-out width by ${wl.sp ? wl.sp.holdout_ratio.toFixed(1) : '—'}×.`],
+    [last.speedup_vs_default ? `${last.speedup_vs_default.toFixed(1)}× → ${last.speedup_vs_mup.toFixed(1)}×` : '—', `Muon’s apparent speedup at width ${comma(last.width || 0)} as the AdamW baseline gets more care. Same Muon run, different baseline.`],
+  ];
+  $('findings').innerHTML = items.map(([b, w]) => `<div class="finding"><span class="big">${b}</span><span class="what">${w}</span></div>`).join('');
+}
+
+/* ── §1 Adam ── */
+const PRE = [[0.5, 0.4, 0.6, 0.45, 0.55], [0.005, 0.004, 0.006, 0.0045, 0.0055], [0.5, -0.4, 0.6, -0.45, 0.55], [0.5, 0, 0, 0, 0]];
+let G = PRE[0].slice(), BC = true;
+function adam(gs, bc, b2 = 0.999, b1 = 0.9, lr = 1e-3, eps = 1e-8) {
+  let m = 0, v = 0, w = 1; return gs.map((g, i) => { const t = i + 1; m = b1 * m + (1 - b1) * g; v = b2 * v + (1 - b2) * g * g;
+    const mh = bc ? m / (1 - b1 ** t) : m, vh = bc ? v / (1 - b2 ** t) : v, st = -lr * mh / (Math.sqrt(vh) + eps); w += st; return { t, g, m, v, mh, vh, st, w, r: -st / lr }; });
+}
+function drawAdam() {
+  const rows = adam(G, BC);
+  table($('adamTbl'), ['t', 'g', 'm', 'v', 'm̂', 'v̂', 'step / η'], rows.map(r => [r.t, fmt(r.g, 3), fmt(r.m, 4), fmt(r.v, 4), fmt(r.mh, 4), fmt(r.vh, 4), r.r.toFixed(3)]));
+  const c = C(), other = adam(G, !BC);
+  chart($('adamChart'), { title: 'Step taken, in units of η', sub: 'solid: the selected setting · faint: the other one', h: 250, right: 70,
+    x: { domain: [0.6, 5.4], label: 'step', name: 't', fmt: v => v }, y: { domain: [Math.min(0, ...rows.map(r => r.r), ...other.map(r => r.r)) - 0.2, Math.max(1.2, ...rows.map(r => r.r), ...other.map(r => r.r)) + 0.3], label: 'step / η', name: 'step/η' },
+    hlines: [{ y: 1, color: c.aqua, label: 'η' }],
+    series: [{ pts: other.map(r => [r.t, r.r]), color: c.muted, width: 1.4, dash: '4 3', dots: 2.5, label: BC ? 'off' : 'on' },
+             { pts: rows.map(r => [r.t, r.r]), color: BC ? c.blue : c.orange, width: 2.4, dots: 3.5, label: BC ? 'on' : 'off' }] });
+  const g = Sm.ghost_steps_in_lr || [];
+  $('adamAns').innerHTML = `In the notebook, the hand computation matches <code>torch.optim.Adam</code>, <code>foreach</code>, <code>fused</code>, AdamW with λ = 0 and the repo’s HandAdamW to <b>16 digits in fp64</b>. In fp32 the state matches to about 7 digits, but the step only to about 5: it is a difference of two numbers near 1. ` +
+    (g.length ? `Inside the GPT, a rare character’s embedding row received zero gradient on steps 2–5 and still moved <b>${g.map(v => Math.abs(v).toFixed(2)).join(', ')} η</b>, because m forgets faster than v. The “zero after 1” preset reproduces it.` : '');
+}
+function adamUI() {
+  const box = $('gins'); box.innerHTML = '';
+  G.forEach((g, i) => { const inp = document.createElement('input'); inp.type = 'number'; inp.step = 'any'; inp.value = g; inp.id = 'g' + i; inp.setAttribute('aria-label', 'gradient ' + (i + 1));
+    inp.oninput = () => { const v = parseFloat(inp.value); if (isFinite(v)) { G[i] = v; drawAdam(); } }; box.appendChild(inp); });
+  $('bcOn').onclick = () => { BC = true; $('bcOn').setAttribute('aria-pressed', 'true'); $('bcOff').setAttribute('aria-pressed', 'false'); drawAdam(); };
+  $('bcOff').onclick = () => { BC = false; $('bcOff').setAttribute('aria-pressed', 'true'); $('bcOn').setAttribute('aria-pressed', 'false'); drawAdam(); };
+  document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { G = PRE[+b.dataset.p].slice(); adamUI(); drawAdam(); });
+}
+
+/* ── §2 bias ── */
+const b2Of = s => 1 - 10 ** (-(2 + 2 * s / 100));   // slider 0..100 -> beta2 0.99 .. 0.9999
+let bcB2 = null;
+function drawF() {
+  const c = C(), b2 = b2Of(+$('b2').value); $('b2v').textContent = b2.toFixed(b2 > 0.9995 ? 5 : 4);
+  const T = []; for (let i = 0; i <= 260; i++) T.push(Math.round(10 ** (i / 260 * 5.3))); const Tu = [...new Set(T)];
+  const f = t => (1 - 0.9 ** t) / Math.sqrt(1 - b2 ** t);
+  let pk = 1, pv = 0; for (let t = 1; t < 400; t++) if (f(t) > pv) { pv = f(t); pk = t; }
+  let s1 = 1; for (let t = 200000; t > 1; t = Math.floor(t * 0.98)) { if (Math.abs(f(t) - 1) >= 0.01) { s1 = t; break; } }
+  for (let t = s1; t < s1 * 1.03 + 2; t++) if (Math.abs(f(t) - 1) < 0.01) { s1 = t; break; }
+  chart($('fChart'), { title: 'Uncorrected ÷ corrected step, f(t)', sub: 'shaded: the twenty steps the brief asks for', h: 280, right: 30,
+    x: { log: true, domain: [1, 2e5], label: 'step', name: 't', fmt: v => comma(v) }, y: { log: true, domain: [0.8, 40], label: 'f(t)', name: 'f', fmt: v => v.toFixed(3) + '×' },
+    bands: [{ x: [1, 20], fill: c.rule }], hlines: [{ y: 1, color: c.ink2 }],
+    series: [{ pts: Tu.map(t => [t, f(t)]), color: c.orange, width: 2.4 }],
+    marks: [{ x: pk, y: pv, color: c.orange, label: `peak ${pv.toFixed(2)}× at t = ${pk}` }, { x: s1, y: 1.01, color: c.aqua, label: `within 1% after ${comma(s1)}`, dy: -10, anchor: 'middle', dx: 0 }] });
+}
+function drawBC() {
+  const c = C(), rs = D.bias.filter(r => r.b2 === bcB2);
+  const Ws = [...new Set(rs.map(r => r.warmup))].sort((a, b) => a - b);
+  const dashOf = { 0: '', [Ws[1]]: '5 4' };
+  const ser = rs.map(r => ({ pts: r.step.map((s, i) => [s, r.units[i]]), color: r.on ? c.blue : c.orange, dash: dashOf[r.warmup] ?? '9 3 2 3', width: 1.9,
+    label: `${r.on ? 'on' : 'off'}${r.warmup ? ', warmup ' + r.warmup : ''}` }));
+  const T = rs[0].step;
+  ser.push({ pts: T.map(t => [t, (1 - 0.9 ** t) / Math.sqrt(1 - bcB2 ** t)]), color: c.muted, width: 1, dash: '2 3', label: 'f(t)' });
+  chart($('bcChart'), { title: `In the GPT, β₂ = ${bcB2}: the step Adam takes`, sub: `median over layers, units of η · solid / dashed / dash-dot: warmup ${Ws.join(' / ')}`, h: 280,
+    x: { log: true, label: 'step', name: 'step', fmt: v => comma(v) }, y: { log: true, label: 'step / η', name: 'step/η' }, series: ser });
+  const row = (Sm.bias_real || []).filter(r => r['β₂'] === bcB2);
+  const bf = Sm.bias_factor['0.999'];
+  $('biasAns').innerHTML = `<b>Answer for the brief:</b> within twenty steps it never stops mattering. With β₂ = 0.999 the over-step is 3.16× at step 1, <b>${bf.peak.toFixed(2)}×</b> at step ${bf.peak_t} and still ${bf.f20.toFixed(2)}× at step 20. It drops below 10% after <b>${comma(bf.within10)}</b> steps and below 1% after <b>${comma(bf.within1)}</b>.<br><br>` +
+    `<b>In the GPT</b> (β₂ = ${bcB2}), switching bias correction off leaves a val-loss gap at step 800 of ` + row.map(r => `<b>${r['final gap'].toFixed(3)}</b> nats with warmup ${r.warmup}`).join(', ') +
+    `. Warmup hides the missing correction only when it outlasts β₂’s memory of 1/(1−β₂) steps. A short warmup is the worst case: once it ends, the uncorrected run trains at about f(40) ≈ 5× the LR, which is too high to escape the loss plateau.`;
+}
+
+/* ── §3 ratio ── */
+let rLr = null, rWv = null;
+function drawRatio() {
+  const c = C(), R = D.ratio, run = R.runs.find(r => r.lr === rLr && r.warmup === rWv); if (!run) return;
+  const host = $('heatWrap'); host.innerHTML = `<div class="ttl">Every layer, every step (log step axis)</div><div class="sub">‖ΔW‖/‖W‖ · lr ${rLr} · warmup ${rWv}</div>`;
+  const cv = document.createElement('canvas'); cv.className = 'heat'; const nT = run.step.length, nL = R.names.length;
+  const cw = 4, ch = 7, left = 78; cv.width = left + nT * cw; cv.height = nL * ch + 18; host.appendChild(cv);
+  const ctx = cv.getContext('2d'); const lo = Math.log10(1e-4), hi = Math.log10(3e-2);
+  const ramp = ['#f3f7fd', '#cfe0f6', '#9cc0ec', '#5f97de', '#2a78d6', '#1c5aa6', '#123d73'];
+  const col = v => { const z = Math.min(1, Math.max(0, (Math.log10(v) - lo) / (hi - lo))) * (ramp.length - 1); return ramp[Math.round(z)]; };
+  ctx.font = '9px "IBM Plex Mono", monospace'; ctx.fillStyle = c.muted; ctx.textBaseline = 'middle';
+  R.names.forEach((n, j) => ctx.fillText(n, 0, j * ch + ch / 2));
+  run.M.forEach((row, i) => row.forEach((v, j) => { ctx.fillStyle = v == null ? c.rule : col(v); ctx.fillRect(left + i * cw, j * ch, cw, ch); }));
+  if (rWv) { const i = run.step.findIndex(s => s >= rWv); ctx.fillStyle = c.orange; ctx.fillRect(left + i * cw, 0, 1.5, nL * ch); }
+  ctx.fillStyle = c.muted; [1, 10, 100, run.step[nT - 1]].forEach(s => { const i = run.step.findIndex(x => x >= s); if (i >= 0) ctx.fillText(comma(s), left + i * cw, nL * ch + 9); });
+  const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; host.appendChild(tip);
+  cv.onpointermove = ev => { const r = cv.getBoundingClientRect(), k = cv.width / r.width, x = (ev.clientX - r.left) * k, y = (ev.clientY - r.top) * k;
+    const i = Math.floor((x - left) / cw), j = Math.floor(y / ch); if (i < 0 || i >= nT || j < 0 || j >= nL) { tip.hidden = true; return; }
+    tip.hidden = false; tip.textContent = `${R.names[j]} · step ${run.step[i]} · ratio ${e1(run.M[i][j])}`; const hr = host.getBoundingClientRect();
+    let L = ev.clientX - hr.left + 12; if (L + 220 > hr.width) L -= 240; tip.style.left = L + 'px'; tip.style.top = (ev.clientY - hr.top - 30) + 'px'; };
+  cv.onpointerleave = () => tip.hidden = true;
+  const hid = R.kinds.map(k => k === 'hidden');
+  const runs = R.runs.filter(r => r.lr === rLr).sort((a, b) => a.warmup - b.warmup);
+  const shades = [c.red, '#9cc0ec', '#5f97de', c.blue, '#1c5aa6', '#123d73'];
+  chart($('rLines'), { title: 'Median hidden-matrix ratio', sub: 'green band: the lesson’s healthy 0.5–2 ×10⁻³', h: 300,
+    x: { log: true, label: 'step', name: 'step', fmt: v => comma(v) }, y: { log: true, label: '‖ΔW‖/‖W‖', name: 'ratio', fmt: e1 },
+    bands: [{ y: [5e-4, 2e-3] }], hlines: [{ y: 1e-3, color: c.aqua }],
+    series: runs.map((r, i) => ({ pts: r.step.map((s, k) => { const vs = r.M[k].filter((_, j) => hid[j]).sort((a, b) => a - b); return [s, vs[Math.floor(vs.length / 2)]]; }),
+      color: r.warmup ? shades[Math.min(i, shades.length - 1)] : c.red, width: r.warmup === rWv ? 2.6 : 1.5, label: `W=${r.warmup}` })) });
+  const rows = (Sm.ratio || []).filter(r => r.lr === rLr);
+  const nn = v => v == null || !isFinite(v) ? '—' : comma(v);
+  table($('ratioTbl'), ['warmup', 'ratio reaches plateau at step (median layer)', 'earliest – latest layer', '÷ warmup', 'peak ratio', 'val loss @ 600'],
+    rows.map(r => [r.warmup, nn(r.stops_changing_median), `${nn(r.earliest)} – ${nn(r.latest)}`, r.median_over_W == null ? '—' : r.median_over_W.toFixed(2), e1(r.peak_ratio), r.final_val.toFixed(3)]),
+    r => r.final_val === Math.min(...rows.map(x => x.final_val)));
+  const u = Sm.units_first_last || [], r1 = (Sm.ratio || []).filter(r => r.lr === rLr), mid = r1.filter(r => r.warmup && r.warmup <= 100);
+  $('ratioAns').innerHTML = `<b>Answer:</b> every run settles on a common plateau near <b>${e1(r1[0]?.plateau)}</b>. For every warmup of 100 steps or less, the ratio reaches it between step <b>${nn(Math.min(...mid.map(r => r.stops_changing_median)))}</b> and <b>${nn(Math.max(...mid.map(r => r.stops_changing_median)))}</b>, whatever the warmup length: a short warmup overshoots and needs time to settle. A 200-step warmup reaches it just before the ramp ends. After that step, the ratio carries no trace of the warmup. ` +
+    `Adam’s own step starts at <b>${u[0]?.toFixed(2)} η</b> and falls to <b>${u[1]?.toFixed(2)} η</b>, below the lesson’s 0.281 noise floor. That fall is what lets a partial LR reach the plateau. The plateau is about 1e-2 rather than the lesson’s 1e-3, as expected for weights of scale 0.02 at η ≈ 1e-3. The output head’s late ratio is <b>${Sm.head_over_body_late?.toFixed(2)}×</b> the body’s, which bears on the lesson §14 question about a separate head LR.`;
+}
+
+/* ── §4 schedules ── */
+let sLr = null;
+function drawSched() {
+  const c = C(), Sd = D.sched, S = Sd.S, stop = Sd.stop, W = Sd.warmup, Dd = Sd.D;
+  const cos = (t, T) => t < W ? (t + 1) / W : 0.5 * (1 + Math.cos(Math.PI * Math.min(1, (t - W + 1) / Math.max(1, T - W))));
+  const wsd = t => t < W ? (t + 1) / W : t < S - Dd ? 1 : 1 - (t - (S - Dd) + 1) / Dd;
+  const xs = [...Array(S).keys()];
+  chart($('schedLR'), { title: 'The schedules', sub: `checkpoint at ${stop - Dd}, decay ${Dd} steps (the WSD branch)`, h: 260,
+    x: { domain: [0, S], label: 'step', name: 'step', fmt: v => v }, y: { domain: [0, 1.08], label: 'LR / peak', name: 'LR', fmt: v => v.toFixed(2) },
+    vlines: [{ x: stop, color: c.orange, label: `stop at ${stop}` }],
+    series: [{ pts: xs.map(t => [t, wsd(t)]), color: c.blue, label: `WSD-${S}` }, { pts: xs.map(t => [t, cos(t, S)]), color: c.violet, label: `cosine-${S}` },
+      { pts: xs.slice(0, stop).map(t => [t, cos(t, stop)]), color: c.violet, dash: '3 3', label: `cosine-${stop}` },
+      { pts: [[stop - Dd - 1, 1], ...xs.slice(stop - Dd, stop).map(t => [t, 1 - (t - stop + Dd + 1) / Dd])], color: c.aqua, width: 2.6, label: 'branch' }] });
+  const cur = k => Sd.curves.find(q => q.kind === k && q.lr === sLr);
+  const ser = [], marks = [];
+  const add = (k, col, dash, lab) => { const q = cur(k); if (q) ser.push({ pts: q.step.map((s, i) => [s, q.val[i]]), color: col, dash, label: lab }); return q; };
+  add(`cosine-${S}`, c.violet, '', `cosine-${S}`); const w = add(`wsd-${S}`, c.blue, '', `WSD-${S}`); add(`cosine-${stop}`, c.violet, '3 3', `cosine-${stop}`);
+  const ce = cur('const+ema'); if (ce) { ser.push({ pts: ce.step.map((s, i) => [s, ce.val[i]]), color: c.muted, width: 1.3, label: 'constant' });
+    const best = Object.entries(ce.ema).sort((a, b) => (a[1].at(-1) ?? 9) - (b[1].at(-1) ?? 9))[0]; if (best) ser.push({ pts: ce.step.map((s, i) => [s, best[1][i]]), color: c.yellow, label: `EMA ${best[0]}` }); }
+  if (w) { const bv = w.branches[`${stop - Dd}-${Dd}-linear`]; const i = w.step.indexOf(stop - Dd); if (bv != null && i >= 0) { ser.push({ pts: [[stop - Dd, w.val[i]], [stop, bv]], color: c.aqua, width: 2.6 }); marks.push({ x: stop, y: bv, color: c.aqua, label: 'branch', dx: -8, anchor: 'end', dy: 14 }); } }
+  const ys = ser.flatMap(s => s.pts.map(p => p[1])).filter(v => v != null); const lo = Math.min(...ys);
+  chart($('schedVal'), { title: 'Val loss', sub: `peak LR ${sLr}, mean of seeds`, h: 260, x: { domain: [W, S], label: 'step', name: 'step', fmt: v => v }, y: { domain: [lo - 0.04, lo + 0.55], label: 'val loss', name: 'val', fmt: v => v.toFixed(4) },
+    vlines: [{ x: stop, color: c.orange }], series: ser, marks });
+  const rows = (Sm.schedules || []).filter(r => r.val != null).sort((a, b) => a.val - b.val);
+  const host = $('schedRank'); const H = 26 + rows.length * 22;
+  chart(host, { title: 'Every shippable model, each at its own best LR', sub: 'mean ± 1 sd over seeds; hover for the LR each one needed', h: H, right: 300,
+    x: { label: 'val loss', name: 'val', fmt: v => v.toFixed(4) }, y: { domain: [rows.length + 0.2, 0.2], label: '', name: 'rank', fmt: v => '#' + Math.round(v) },
+    series: [], marks: rows.map((r, i) => ({ x: r.val, y: i + 1, err: [r.val - r.std, r.val + r.std], color: /stopped at/.test(r.model) ? c.orange : /branch/.test(r.model) ? c.aqua : /EMA|constant/.test(r.model) ? c.yellow : /full/.test(r.model) ? c.muted : c.violet,
+      label: r.model, dx: 10, tip: `${r.model} (lr ${r.best_lr})` })) });
+  host.querySelectorAll('svg > text').forEach(t => { if (/^#?\d/.test(t.textContent) && +t.getAttribute('x') < 52) t.remove(); });
+  const v = Object.fromEntries(rows.map(r => [r.model, r]));
+  const cS = v[`cosine-${S}, stopped at ${stop}`], wS = v[`WSD-${S}, stopped at ${stop}`], br = rows.find(r => r.model.startsWith(`WSD branch ${stop - Dd}→${stop} (linear`));
+  const cO = rows.find(r => r.model.startsWith(`cosine-${stop} (oracle`)), wF = v[`WSD-${S}, full (${S} steps)`], cF = v[`cosine-${S}, full (${S} steps)`];
+  $('schedAns').innerHTML = `<b>The brief, literally:</b> at step ${stop}, cosine ${fmt(cS?.val, 4)} ± ${fmt(cS?.std, 2)} vs WSD ${fmt(wS?.val, 4)} ± ${fmt(wS?.std, 2)}, a tie within seed noise. ` +
+    `<b>I would keep the WSD run.</b> For the same ${stop} steps, its decay branch from the step-${stop - Dd} checkpoint reaches <b>${fmt(br?.val, 4)}</b>, better than any cosine at ${stop}. Cosine planned for exactly ${stop} steps did worse (${fmt(cO?.val, 4)}): early in training, decaying costs more than it gains. ` +
+    `Continuing, WSD reaches ${fmt(wF?.val, 4)} at ${S} against cosine’s ${fmt(cF?.val, 4)}. Constant LR with an EMA of the weights ties the branch, with no decay at all.<br><span class="note">Orange: what the brief asks for · aqua: WSD branches · violet: cosine · yellow: constant LR ± weight averaging · grey: the full ${S}-step runs.</span>`;
+}
+
+/* ── §5 width ── */
+let wP = 'sp';
+function drawWidth() {
+  const c = C(), rows = D.sweep.filter(r => r.param === wP), shades = ['#9cc0ec', '#5f97de', c.blue, c.orange];
+  const mins = (Sm.sweep_minima || []).filter(r => r.param === wP);
+  const allY = rows.flatMap(r => r.loss).filter(v => v != null), lo = Math.min(...allY);
+  chart($('sweepChart'), { title: `Loss vs learning rate, ${wP === 'sp' ? 'standard parameterisation' : 'muP'}`, sub: '★ fitted minimum, bar: 90% bootstrap interval', h: 300,
+    x: { log: true, label: 'peak learning rate', name: 'lr', fmt: e1 }, y: { domain: [lo - 0.05, lo + 0.9], label: 'val loss after 600 steps', name: 'val', fmt: v => v.toFixed(4) },
+    series: rows.map((r, i) => ({ pts: r.lr.map((l, k) => [l, r.loss[k]]), color: r.held_out ? c.orange : shades[i], dash: r.held_out ? '5 4' : '', dots: 2.5, label: `${comma(r.width)}${r.held_out ? ' (held out)' : ''}` })),
+    marks: mins.map((m, i) => ({ x: m.lr_star, y: m.loss, err: [m.ci_lo, m.ci_hi], star: true, r: 8, color: m.held_out ? c.orange : shades[i], tip: `width ${m.width}: lr* ${e1(m.lr_star)}` })) });
+  const L = Sm.width_law || {};
+  const ser = [], marks = [], bands = [];
+  for (const [p, col] of [['sp', c.blue], ['mup', c.aqua]]) {
+    const l = L[p]; if (!l) continue; const ms = (Sm.sweep_minima || []).filter(r => r.param === p);
+    const tr = ms.filter(m => !m.held_out); const xs = tr.map(m => Math.log(m.width)), ys = tr.map(m => Math.log(m.lr_star));
+    const n = xs.length, mx = xs.reduce((a, b) => a + b) / n, my = ys.reduce((a, b) => a + b) / n;
+    const b = xs.reduce((a, x, i) => a + (x - mx) * (ys[i] - my), 0) / xs.reduce((a, x) => a + (x - mx) ** 2, 0), a = my - b * mx;
+    ser.push({ pts: [200, 5200].map(w => [w, Math.exp(a + b * Math.log(w))]), color: col, dash: '5 4', width: 1.3, opacity: p === wP ? 1 : 0.35 });
+    for (const m of ms) marks.push({ x: m.width, y: m.lr_star, yerr: [m.ci_lo, m.ci_hi], color: col, hollow: m.held_out, tip: `${p} width ${m.width}${m.held_out ? ' (held out)' : ''}: ${e1(m.lr_star)}` });
+    marks.push({ x: 4096, y: l.recommend, yerr: l.rec_range, star: true, r: 9, color: col, label: `${p.toUpperCase()} → ${e1(l.recommend)}`, dx: -12, anchor: 'end', tip: `${p}: recommended at 4,096 (bar: range of three estimators)` });
+  }
+  ser.push({ pts: [[256, 3e-3], [4096, 3e-3 * 256 / 4096]], color: c.muted, dash: '2 3', width: 1, label: 'lesson table' });
+  chart($('lawChart'), { title: 'Width law: fitted on 256–1,024, tested on 2,048', sub: 'hollow: the held-out width · ★ prediction at 4,096', h: 300, right: 80,
+    x: { log: true, domain: [200, 5200], label: 'width', name: 'width', fmt: comma }, y: { log: true, label: 'best LR', name: 'lr*', fmt: e1 }, series: ser, marks });
+  const sp = L.sp, mp = L.mup;
+  $('widthAns').innerHTML = sp ? `<b>SP:</b> the power law through 256–1,024 has slope <b>${sp.slope.toFixed(2)}</b>, close to the lesson’s −1. It predicted ${e1(sp.pred_holdout)} for the held-out width 2,048. The measurement was <b>${e1(sp.measured_holdout)}</b>, ${sp.holdout_ratio.toFixed(2)}× off and ${sp.holdout_inside ? 'inside' : 'outside'} the bootstrap interval, so the law bends. ` +
+    `For 4,096, three reasonable estimators span ${e1(sp.rec_range[0])}–${e1(sp.rec_range[1])}. I would use <b>${e1(sp.recommend)}</b> with low-to-moderate confidence, about ×${Math.sqrt(sp.spread).toFixed(1)} either way, and check ×0.5 / ×1 / ×2 at 4,096 before committing.<br><br>` +
+    (mp ? `<b>muP:</b> lr = <b>${e1(mp.common_lr)}</b> is the best measured LR at every width from 256 to 2,048. Under SP the best single LR loses ${sp.worst_regret.toFixed(2)} nats at some width. At 4,096 I would use a base LR of ${e1(mp.common_lr)} (hidden matrices ×256/4,096) with high confidence. And at its own best LR, the muP model gets better with every doubling of width, while SP stops improving after 512.` : '') : '';
+}
+
+/* ── §6 Muon ── */
+let mW = null;
+function drawMuon() {
+  const c = C(), rs = D.muon.filter(r => r.width === mW);
+  const COL = { 'AdamW β₂=0.999': c.blue, 'AdamW β₂=0.95': c.violet, 'AdamW muP': c.aqua, 'Muon': c.magenta };
+  const ys = rs.flatMap(r => r.loss).filter(v => v != null), lo = Math.min(...ys);
+  chart($('muSweep'), { title: 'Every arm swept on one LR axis', sub: `width ${comma(mW)} · final val loss · ★ best`, h: 290, right: 110, x: { log: true, label: 'peak LR', name: 'lr', fmt: e1 }, y: { domain: [lo - 0.05, lo + 0.95], label: 'val loss', name: 'val', fmt: v => v.toFixed(4) },
+    series: rs.map(r => ({ pts: r.lr.map((l, k) => [l, r.loss[k]]), color: COL[r.opt], dots: 2.5, label: r.opt })),
+    marks: rs.map(r => ({ x: r.best, y: r.loss[r.lr.indexOf(r.best)], star: true, color: COL[r.opt], tip: `${r.opt}: best lr ${e1(r.best)}` })) });
+  const sel = rs.filter(r => r.opt !== 'AdamW β₂=0.95');
+  const vy = sel.flatMap(r => r.val.concat(r.train)).filter(v => v != null);
+  chart($('muCurve'), { title: 'Val (dots) and train (faint), each at its best LR', sub: 'Muon’s val loss stalls while its train loss keeps falling: it is overfitting', h: 290, right: 110,
+    x: { domain: [0, 620], label: 'step', name: 'step', fmt: comma }, y: { domain: [Math.min(...vy) - 0.05, 2.7], label: 'loss', name: 'loss', fmt: v => v.toFixed(3) },
+    series: sel.flatMap(r => [{ pts: r.step.map((s, k) => [s, r.train[k]]), color: COL[r.opt], width: 1, opacity: 0.4 },
+                              { pts: r.vstep.map((s, k) => [s, r.val[k]]), color: COL[r.opt], width: 2.2, dots: 3, label: r.opt }]) });
+  const rows = Sm.muon || [];
+  table($('muTbl'), ['width', 'AdamW (LR tuned)', 'AdamW β₂=0.95', 'AdamW muP', 'Muon', 'vs default LR', 'vs LR tuned', 'vs muP + LR tuned'],
+    rows.map(r => [comma(r.width), fmt(r.adamw999_val, 4), fmt(r.adamw95_val, 4), fmt(r.mup_val, 4), fmt(r.muon_val, 4), r.speedup_vs_default.toFixed(1) + '×', r.speedup_vs_lr_tuned.toFixed(1) + '×', r.speedup_vs_mup.toFixed(1) + '×']));
+  const r1 = rows[rows.length - 1] || {};
+  $('muAns').innerHTML = rows.length ? `Speedup = 600 ÷ the step at which Muon’s <b>val</b> loss reaches the baseline’s final val loss. I use val loss because Muon’s training loss ends ${r1.muon_val_minus_train?.toFixed(2)} nats below its val loss: it is memorising TinyShakespeare. ` +
+    `At width ${comma(r1.width)} the same Muon run looks <b>${r1.speedup_vs_default.toFixed(1)}×</b> faster against a default-LR AdamW, ${r1.speedup_vs_lr_tuned.toFixed(1)}× against an LR-tuned one (β₂ = 0.95 did not help AdamW), and <b>${r1.speedup_vs_mup.toFixed(1)}×</b> once AdamW also gets muP, which closes about ${Math.round(100 * (1 - r1.gap_vs_mup / r1.gap_vs_best_adamw))}% of the val gap. ` +
+    `What remains is still above the lesson’s 1.1–1.4×, which was measured at 0.1–1.2B parameters over long runs, so I treat it as an upper bound for tiny models and short runs.` : '';
+}
+
+function drawAll() { findings(); drawAdam(); drawF(); drawBC(); drawRatio(); drawSched(); drawWidth(); drawMuon(); }
+adamUI();
+$('b2').oninput = drawF;
+const b2s = [...new Set(D.bias.map(r => r.b2))].sort((a, b) => b - a); bcB2 = b2s[0]; seg($('bcB2'), b2s.map(v => [v, String(v)]), bcB2, v => { bcB2 = v; drawBC(); });
+const lrs = [...new Set(D.ratio.runs.map(r => r.lr))].sort((a, b) => a - b), Ws = [...new Set(D.ratio.runs.map(r => r.warmup))].sort((a, b) => a - b);
+rLr = lrs[0]; rWv = Ws.includes(100) ? 100 : Ws[Math.floor(Ws.length / 2)];
+seg($('rLr'), lrs.map(v => [v, String(v)]), rLr, v => { rLr = v; drawRatio(); }); seg($('rW'), Ws.map(v => [v, String(v)]), rWv, v => { rWv = v; drawRatio(); });
+const slrs = [...new Set(D.sched.curves.map(q => q.lr))].sort((a, b) => a - b); sLr = slrs.includes(1e-3) ? 1e-3 : slrs[0];
+seg($('sLr'), slrs.map(v => [v, String(v)]), sLr, v => { sLr = v; drawSched(); });
+document.querySelectorAll('#wP button').forEach(b => b.onclick = () => { wP = b.dataset.v; document.querySelectorAll('#wP button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); drawWidth(); });
+const mws = [...new Set(D.muon.map(r => r.width))].sort((a, b) => a - b); mW = mws[0]; seg($('mW'), mws.map(v => [v, comma(v)]), mW, v => { mW = v; drawMuon(); });
+$('prof').textContent = D.profile === 'full' ? 'Profile: full (Modal A100).' : 'Profile: QUICK smoke test. These numbers are placeholders, not results.';
+drawAll();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawAll);
+new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
